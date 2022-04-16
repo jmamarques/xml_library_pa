@@ -13,4 +13,4 @@ jobs:
      #- name: Package
       #  run: mvn -Dmaven.test.skip=true package
       - name: Try it!
-        run: java MainKt
+        run: java -cp target/xmlLibrary-1.0-SNAPSHOT.jar MainKt
