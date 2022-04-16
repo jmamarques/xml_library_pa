@@ -8,4 +8,4 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - uses: fwilhe2/setup-kotlin@main
-      - run: kotlinc XmlLibrary.kt -include-runtime -d /tmp/hello.jar; java -jar /tmp/hello.jar
+      - run: kotlinc Main.kt -include-runtime -d /tmp/hello.jar; java -jar /tmp/hello.jar
