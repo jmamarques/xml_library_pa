@@ -1,11 +1,16 @@
 name: CI Kotlin
-on:
-  push:
-  workflow_dispatch:
+on: [push]
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-      - uses: fwilhe2/setup-kotlin@main
-      - run: kotlinc Main.kt -include-runtime -d /tmp/hello.jar; java -jar /tmp/hello.jar
+      - uses: actions/checkout@v1
+      - uses: actions/setup-java@v1
+        with:
+          java-version: '11'
+      - name: Run tests
+        run: mvn test
+      - name: Package
+        run: mvn -Dmaven.test.skip=true package
+      - name: Try it!
+        run: java -cp target/xmlLibrary-1.0-SNAPSHOT-jar-with-dependencies.jar Main
