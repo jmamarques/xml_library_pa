@@ -16,11 +16,9 @@ jobs:
           java-version: 17
           distribution: 'adopt'
       - name: Build with Gradle
-        uses: gradle/gradle-build-action@0d13054264b0bb894ded474f08ebb30921341cee
-        with:
-          arguments: build
+        run: ./gradlew build
   notification:
-    name: Notify
+    name: notify
     runs-on: ubuntu-18.04
     needs: [ build ]
     if: always()
