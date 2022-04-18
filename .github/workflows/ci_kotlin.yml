@@ -22,14 +22,23 @@ jobs:
   notification:
     name: Notify
     runs-on: ubuntu-18.04
-    needs: [ build ]
-    if: always()
+    #needs: [ build ]
+    #if: always()
+    #steps:
+    #  - uses: martialonline/workflow-status@v2
+    #    id: check
+    #  - run: echo "Workflow failed"
+    #    if: steps.check.outputs.status == 'failure'
+    #  - run: echo "Workflow was cancelled"
+    #    if: steps.check.outputs.status == 'cancelled'
+    #  - run: echo "Workflow was successful"
+    #    if: steps.check.outputs.status == 'success'
+    continue-on-error: true
     steps:
-      - uses: martialonline/workflow-status@v2
-        id: check
-      - run: echo "Workflow failed"
-        if: steps.check.outputs.status == 'failure'
-      - run: echo "Workflow was cancelled"
-        if: steps.check.outputs.status == 'cancelled'
-      - run: echo "Workflow was successful"
-        if: steps.check.outputs.status == 'success'
+      - name: Checkout Repository
+        uses: actions/checkout@v2
+      - name: Test Action
+        id: test
+        uses: ./
+      - name: Get Test Output
+        run: echo "Workflow Status '${{ steps.test.outputs.status }}'"
