@@ -4,13 +4,24 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v1
-      - uses: actions/setup-java@v1
+      - uses: actions/checkout@v2
+      - name: Set up JDK 17
+        uses: actions/setup-java@v2
         with:
-          java-version: '16'
-      - name: Run tests
-        run: mvn test
-      - name: Package
-        run: mvn -Dmaven.test.skip=true package
-      - name: Run it!
-        run: java -jar target/xmlLibrary-1.0-SNAPSHOT-jar-with-dependencies.jar
+          java-version: 17
+      - name: Build with Gradle
+        run: ./gradlew build
+  notification:
+    name: Notify
+    runs-on: ubuntu-18.04
+    needs: [ build ]
+    if: always()
+    steps:
+      - uses: martialonline/workflow-status@v2
+        id: check
+      - run: echo "Workflow failed"
+        if: steps.check.outputs.status == 'failure'
+      - run: echo "Workflow was cancelled"
+        if: steps.check.outputs.status == 'cancelled'
+      - run: echo "Workflow was successful"
+        if: steps.check.outputs.status == 'success'
