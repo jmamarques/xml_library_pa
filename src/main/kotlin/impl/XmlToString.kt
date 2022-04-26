@@ -8,7 +8,7 @@ import structure.Visitor
 /**
  * JMA - 25/04/2022 22:42
  **/
-class XmlToString: Visitor {
+class XmlToString : Visitor {
     private val xmlBuilder: StringBuilder = StringBuilder()
 
     override fun visit(n: NestedNode): Boolean {
@@ -21,7 +21,10 @@ class XmlToString: Visitor {
     }
 
     override fun visit(l: LeafNode) {
-        xmlBuilder.append("<${l.name}${this.attributesToString(l)}>${l.element}</${l.name}>\n")
+        if (l.element.isNotBlank())
+            xmlBuilder.append("<${l.name}${this.attributesToString(l)}>${escapingChar(l.element)}</${l.name}>\n")
+        else
+            xmlBuilder.append("<${l.name}${this.attributesToString(l)}/>\n")
     }
 
     fun clear() {
@@ -37,5 +40,23 @@ class XmlToString: Visitor {
             n.attributes.joinToString(" ", " ") { "${it.name()}=\"${it.value()}\"" }
         else
             ""
+    }
+
+    /**
+     * Replace escaping char for valid values
+     */
+    private fun escapingChar(v: String?): String {
+        var res = v ?: ""
+        //        &lt;	<	less than
+        res = res.replace("<", "&lt;")
+        //        &gt;	>	greater than
+        res = res.replace(">", "&gt;")
+        //        &amp;	&	ampersand
+        res = res.replace("\\&(?!amp;|gt;|&lt;|apos;|quot;)", "&amp;")
+        //        &apos;	'	apostrophe
+        res = res.replace("'", "&apos;")
+        //        &quot;	"	quotation mark
+        res = res.replace("\"", "&quot;")
+        return res
     }
 }
