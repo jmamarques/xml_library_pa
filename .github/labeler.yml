@@ -1,0 +1,3 @@
+test: src/test/**/*
+source: src/main/**/*
+documentation: README.md
