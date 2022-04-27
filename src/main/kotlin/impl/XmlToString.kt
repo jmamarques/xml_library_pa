@@ -12,32 +12,45 @@ class XmlToString : Visitor {
     private val xmlBuilder: StringBuilder = StringBuilder()
 
     override fun visit(n: NestedNode): Boolean {
-        xmlBuilder.append("<${n.name}${this.attributesToString(n)}>\n")
+        xmlBuilder.append("<${escapingChar(n.name)}${this.attributesToString(n)}>\n")
         return true
     }
 
     override fun endVisit(n: NestedNode) {
-        xmlBuilder.append("</${n.name}>\n")
+        xmlBuilder.append("</${escapingChar(n.name)}>\n")
     }
 
     override fun visit(l: LeafNode) {
-        if (l.element.isNotBlank())
-            xmlBuilder.append("<${l.name}${this.attributesToString(l)}>${escapingChar(l.element)}</${l.name}>\n")
-        else
-            xmlBuilder.append("<${l.name}${this.attributesToString(l)}/>\n")
+        val name = escapingChar(l.name)
+        if (l.element.isNotBlank()) {
+            val value = escapingChar(l.element)
+            xmlBuilder.append(
+                "<$name${this.attributesToString(l)}>$value</$name>\n"
+            )
+        } else
+            xmlBuilder.append("<$name${this.attributesToString(l)}/>\n")
     }
 
+    /**
+     * Clear Visitor builder
+     */
     fun clear() {
         xmlBuilder.clear()
     }
 
+    /**
+     * Textual representation on XML Objects
+     */
     override fun toString(): String {
         return xmlBuilder.toString()
     }
 
+    /**
+     * Auxiliary fun to populate attributes
+     */
     private fun attributesToString(n: Node): String {
         return if (n.attributes.size > 0)
-            n.attributes.joinToString(" ", " ") { "${it.name()}=\"${it.value()}\"" }
+            n.attributes.joinToString(" ", " ") { "${escapingChar(it.name())}=\"${escapingChar(it.value())}\"" }
         else
             ""
     }

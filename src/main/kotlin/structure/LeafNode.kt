@@ -7,4 +7,9 @@ class LeafNode(name: String, val element: String, attributes: MutableList<Attrib
     override fun accept(v: Visitor) {
         v.visit(this)
     }
+
+    override fun toString(): String {
+        return "LeafNode(element='$element', name=$name)"
+    }
+
 }

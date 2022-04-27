@@ -12,4 +12,9 @@ class NestedNode(name: String, val elements: MutableList<Node>, attributes: Muta
         v.endVisit(this)
     }
 
+    override fun toString(): String {
+        return "NestedNode(elements=$elements, name=$name)"
+    }
+
+
 }
