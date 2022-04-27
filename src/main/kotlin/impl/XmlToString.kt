@@ -12,12 +12,18 @@ class XmlToString : Visitor {
     private val xmlBuilder: StringBuilder = StringBuilder()
 
     override fun visit(n: NestedNode): Boolean {
-        xmlBuilder.append("<${escapingChar(n.name)}${this.attributesToString(n)}>\n")
+        if(n.elements.isEmpty()){
+            xmlBuilder.append("<${escapingChar(n.name)}${this.attributesToString(n)}/>\n")
+        } else {
+            xmlBuilder.append("<${escapingChar(n.name)}${this.attributesToString(n)}>\n")
+        }
         return true
     }
 
     override fun endVisit(n: NestedNode) {
-        xmlBuilder.append("</${escapingChar(n.name)}>\n")
+        if(n.elements.isNotEmpty()){
+            xmlBuilder.append("</${escapingChar(n.name)}>\n")
+        }
     }
 
     override fun visit(l: LeafNode) {
