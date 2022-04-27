@@ -11,7 +11,7 @@ import structure.Visitor
 class FindXmlTag(private val predicate: (Node) -> Boolean) : Visitor {
 
     /* Node founded base on #predicate */
-    private var node: Node? = null
+    var node: Node? = null
 
     /* Calculated property - Has found node */
     val hasFound: Boolean get() = node != null
