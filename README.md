@@ -56,3 +56,9 @@ As anotações que auxiliam nessa acção são: [@XmlIgnore](src/main/kotlin/ann
 * 4- O XmlName da override a esse nome
 * 5- O XmlIgnore ignora o item
 * 6- O XmlTagContent indica que é o unico conteudo daquela class
+
+## Parser from Object to XML Object
+```kotlin
+val prototypeI = PrototypeI()
+val parseObject = XmlParser.parseObject(prototypeI)
+```

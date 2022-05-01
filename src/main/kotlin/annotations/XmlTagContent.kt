@@ -1,3 +1,4 @@
 package annotations
-//@Target({AnnotationTarget.})
+
+@Target(AnnotationTarget.PROPERTY, AnnotationTarget.FIELD)
 annotation class XmlTagContent()

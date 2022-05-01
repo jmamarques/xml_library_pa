@@ -4,6 +4,8 @@ import structure.LeafNode
 import structure.NestedNode
 import structure.Node
 import structure.Visitor
+import util.XmlUtil
+import util.XmlUtil.Companion.escapingChar
 
 /**
  * JMA - 25/04/2022 22:42
@@ -61,21 +63,4 @@ class XmlToString : Visitor {
             ""
     }
 
-    /**
-     * Replace escaping char for valid values
-     */
-    private fun escapingChar(v: String?): String {
-        var res = v ?: ""
-        //        &lt;	<	less than
-        res = res.replace("<", "&lt;")
-        //        &gt;	>	greater than
-        res = res.replace(">", "&gt;")
-        //        &amp;	&	ampersand
-        res = res.replace("\\&(?!amp;|gt;|&lt;|apos;|quot;)", "&amp;")
-        //        &apos;	'	apostrophe
-        res = res.replace("'", "&apos;")
-        //        &quot;	"	quotation mark
-        res = res.replace("\"", "&quot;")
-        return res
-    }
 }

@@ -1,4 +1,5 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+import org.jetbrains.kotlin.ir.backend.js.compile
 
 plugins {
     kotlin("jvm") version "1.6.20"
@@ -14,6 +15,10 @@ repositories {
 
 dependencies {
     testImplementation(kotlin("test"))
+    // https://mvnrepository.com/artifact/org.jetbrains.kotlin/kotlin-reflect
+    runtimeOnly("org.jetbrains.kotlin:kotlin-reflect:1.6.21")
+    compileOnly("org.jetbrains.kotlin:kotlin-reflect:1.6.21")
+
 }
 
 tasks.test {
