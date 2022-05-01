@@ -11,6 +11,7 @@ class PrototypeIII {
     @XmlTagContent
     @XmlIgnore
     var intField: Int = 0
+    @XmlTagContent
     var doubleField: Double = 0.0
     @XmlName("numericField")
     var numberField: Number = 0
