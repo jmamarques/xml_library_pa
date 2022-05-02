@@ -6,11 +6,13 @@ import annotations.XmlName
 @XmlName("PropA")
 class PrototypeI {
     @XmlIgnore
-    var intField: Int = 0
-    var doubleField: Double = 0.0
+    @XmlName("error")
+    var intField: Int = 4
+    var doubleField: Double = 40.0
     @XmlName("numericField")
-    var numberField: Number = 0
-    var strField: String = ""
+    var numberField: Number = 4
+    var strField: String = "avc"
     var listField: List<String> = listOf("")
+    @XmlName("activity")
     var enumField: TypeEnum =TypeEnum.A
 }

@@ -10,12 +10,12 @@ import annotations.XmlTagContent
 class PrototypeIII {
     @XmlTagContent
     @XmlIgnore
-    var intField: Int = 0
+    var intField: Int = 1
     @XmlTagContent
-    var doubleField: Double = 0.0
+    var doubleField: Double = 01.0
     @XmlName("numericField")
-    var numberField: Number = 0
-    var strField: String = ""
+    var numberField: Number = 11
+    var strField: String = "a"
     var objField: PrototypeI = PrototypeI()
     var listField: List<String> = listOf("")
     var enumField: TypeEnum =TypeEnum.A

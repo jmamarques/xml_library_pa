@@ -1,5 +1,8 @@
 package util
 
+import impl.XmlToString
+import structure.Node
+
 /**
  * JMA - 30/04/2022 22:19
  **/
@@ -30,6 +33,15 @@ class XmlUtil {
          */
         fun isValidEntityName(v: String?): Boolean {
             return v != null && !v.contains(Regex("\\s+"))
+        }
+
+        /**
+         * Println of XML object
+         */
+        fun printXml(obj: Node): Unit {
+            val xxx = XmlToString()
+            obj.accept(xxx)
+            println(xxx.toString())
         }
     }
 }

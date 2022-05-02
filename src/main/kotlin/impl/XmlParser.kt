@@ -3,9 +3,6 @@ package impl
 import annotations.XmlIgnore
 import annotations.XmlName
 import annotations.XmlTagContent
-import model.PrototypeI
-import model.PrototypeIII
-import model.TypeEnum
 import org.jetbrains.annotations.NotNull
 import structure.LeafNode
 import structure.NestedNode
@@ -15,8 +12,6 @@ import util.XmlUtil.Companion.isValidEntityName
 import java.util.*
 import kotlin.reflect.KCallable
 import kotlin.reflect.KClass
-import kotlin.reflect.KClassifier
-import kotlin.reflect.KType
 import kotlin.reflect.full.declaredMembers
 import kotlin.reflect.full.isSubclassOf
 
@@ -28,9 +23,7 @@ class XmlParser {
 
     companion object {
 
-        fun KClassifier?.isEnum() = this is KClass<*> && this.isSubclassOf(Enum::class)
-        fun KClass<*>?.isEnum() = this is KClass<*> && this.isSubclassOf(Enum::class)
-        fun KType?.isEnum() = this is KClass<*> && this.isSubclassOf(Enum::class)
+        private fun KClass<*>?.isEnum() = this is KClass<*> && this.isSubclassOf(Enum::class)
 
         /**
          * Parse obj to Xml Obj
@@ -44,7 +37,6 @@ class XmlParser {
             if (containsIgnore) {
                 return Optional.empty()
             }
-            val node: Optional<Node> = Optional.empty()
             // match primitive types and other types
             val root: Optional<Node> = when (kClass) {
                 String::class, Int::class, Long::class, Float::class, Double::class, Short::class,
@@ -54,6 +46,10 @@ class XmlParser {
                     // enums or complex objects
                     if (kClass.isEnum()) {
                         Optional.of(createLeafNode(obj.toString()))
+                    } else if (obj is List<*>) {
+                        val nestedNode = NestedNode(escapingChar("root"), mutableListOf(), mutableListOf())
+                        obj.forEach { elem -> nestedNode.elements.add(makeDecision(elem)) }
+                        Optional.of(nestedNode)
                     } else {
                         Optional.of(createNestedNode(obj))
                     }
@@ -62,7 +58,10 @@ class XmlParser {
             return root
         }
 
-        fun <T> createLeafNode(obj: T, name: String = "root"): Node {
+        /**
+         * Create a LeafNode
+         */
+        private fun <T> createLeafNode(obj: T, name: String = "root"): Node {
             // Validation
             require(obj != null) { "The value must be different from null" }
             val kClass = obj!!::class
@@ -75,7 +74,10 @@ class XmlParser {
             return LeafNode(name = escapingChar(propName), escapingChar("$obj"), mutableListOf())
         }
 
-        fun <T> createNestedNode(obj: T, name: String = ""): Node {
+        /**
+         * Create a NestedNode
+         */
+        private fun <T> createNestedNode(obj: T, name: String = ""): Node {
             require(obj != null) { "The obj must be different from null" }
             val kClass = obj!!::class
 
@@ -83,7 +85,7 @@ class XmlParser {
                 TODO("We do not support class with XmlIgnore")
             }
             // get properties
-            val xmlName = kClass.annotations
+            var xmlName = kClass.annotations
                 .find { it.annotationClass == XmlName::class }
             var propName =
                 if (xmlName != null && (xmlName as XmlName).name.isNotBlank()) xmlName.name else if (name.isNotBlank()) name else kClass.simpleName
@@ -104,7 +106,22 @@ class XmlParser {
                 props.forEach {
                     val value = it.call(obj)
                     if (value != null) {
-
+                        val xmlName =
+                            it.annotations.find { annotation -> annotation.annotationClass == XmlName::class }
+                        val propName =
+                            if (xmlName != null && (xmlName as XmlName).name.isNotBlank()) xmlName.name else if (it.name.isNotBlank()) it.name else "anonymous"
+                        when (value::class) {
+                            String::class, Int::class, Long::class, Float::class, Double::class, Short::class,
+                            ULong::class, UInt::class, UShort::class, Byte::class, UByte::class, Date::class,
+                            Boolean::class -> elements.add(createLeafNode(value, propName))
+                            else -> if (value::class.isEnum()) {
+                                elements.add(createLeafNode(value, propName))
+                            } else if (value is List<*>) {
+                                value.forEach { elem -> elements.add(makeDecision(elem, propName)) }
+                            } else {
+                                elements.add(createNestedNode(value))
+                            }
+                        }
                     }
                 }
             }
@@ -131,6 +148,9 @@ class XmlParser {
                     Boolean::class -> createLeafNode(value, propName!!)
                     else -> if (value::class.isEnum()) {
                         createLeafNode(obj, propName!!)
+                    } else if (value is List<*>) {
+                        value.forEach { elem -> root.elements.add(makeDecision(elem, propName!!)) }
+                        root
                     } else {
                         root.elements.add(createNestedNode(value))
                         root
@@ -140,18 +160,27 @@ class XmlParser {
                 createLeafNode("", propName!!)
             }
         }
-    }
-}
 
-fun main() {
-//    XmlParser.parseObject("str")
-    val prototypeI = PrototypeI()
-    val prototypeIII = PrototypeIII()
-    val parseObject = XmlParser.parseObject(prototypeI)
-    val parseObject2 = XmlParser.parseObject(prototypeIII)
-    println(XmlParser.parseObject(TypeEnum.A))
-    val createLeafNode = XmlParser.createLeafNode("str", "value")
-    println(createLeafNode)
-    println(parseObject)
-    println(parseObject2)
+        /**
+         * Helps to decide which element should we create or not
+         */
+        private fun <T> makeDecision(obj: T, propName: String = ""): Node {
+            require(obj != null) { "The object must be different from null" }
+            return when (obj!!::class) {
+                String::class, Int::class, Long::class, Float::class, Double::class, Short::class,
+                ULong::class, UInt::class, UShort::class, Byte::class, UByte::class, Date::class,
+                Boolean::class -> createLeafNode(obj, propName.ifBlank { "object" })
+                else -> if (obj!!::class.isEnum()) {
+                    createLeafNode(obj, propName.ifBlank { "enum" })
+                } else if (obj is List<*>) {
+                    val nestedNode =
+                        NestedNode(escapingChar(propName.ifBlank { "list" }), mutableListOf(), mutableListOf())
+                    obj.forEach { elem -> nestedNode.elements.add(makeDecision(elem, propName)) }
+                    nestedNode
+                } else {
+                    createNestedNode(obj, propName)
+                }
+            }
+        }
+    }
 }
