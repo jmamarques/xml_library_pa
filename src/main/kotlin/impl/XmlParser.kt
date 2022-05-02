@@ -81,9 +81,6 @@ class XmlParser {
             require(obj != null) { "The obj must be different from null" }
             val kClass = obj!!::class
 
-            if (kClass.annotations.any { it.annotationClass == XmlIgnore::class }) {
-                TODO("We do not support class with XmlIgnore")
-            }
             // get properties
             var xmlName = kClass.annotations
                 .find { it.annotationClass == XmlName::class }
@@ -119,7 +116,9 @@ class XmlParser {
                             } else if (value is List<*>) {
                                 value.forEach { elem -> elements.add(makeDecision(elem, propName)) }
                             } else {
-                                elements.add(createNestedNode(value))
+                                if(!value::class.annotations.any { it.annotationClass == XmlIgnore::class }){
+                                    elements.add(createNestedNode(value))
+                                }
                             }
                         }
                     }
@@ -152,7 +151,9 @@ class XmlParser {
                         value.forEach { elem -> root.elements.add(makeDecision(elem, propName!!)) }
                         root
                     } else {
-                        root.elements.add(createNestedNode(value))
+                        if(!value::class.annotations.any { it.annotationClass == XmlIgnore::class }){
+                            root.elements.add(createNestedNode(value))
+                        }
                         root
                     }
                 }
