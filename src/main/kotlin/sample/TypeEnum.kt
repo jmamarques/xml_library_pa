@@ -1,4 +1,4 @@
-package model
+package sample
 
 /**
  * JMA - 30/04/2022 22:18

@@ -1,9 +1,9 @@
 package impl
 
-import model.PrototypeI
-import model.PrototypeII
-import model.PrototypeIII
-import model.TypeEnum
+import sample.PrototypeI
+import sample.PrototypeII
+import sample.PrototypeIII
+import sample.TypeEnum
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
 import util.XmlUtil

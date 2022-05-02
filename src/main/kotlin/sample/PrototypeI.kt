@@ -1,4 +1,4 @@
-package model
+package sample
 
 import annotations.XmlIgnore
 import annotations.XmlName
