@@ -19,16 +19,16 @@ import kotlin.reflect.full.isSubclassOf
  * JMA - 30/04/2022 22:30
  * XML Parser that converts objects to library objects
  **/
-class XmlParser {
+class XmlConverter {
 
     companion object {
 
         private fun KClass<*>?.isEnum() = this is KClass<*> && this.isSubclassOf(Enum::class)
 
         /**
-         * Parse obj to Xml Obj
+         * Convert obj to Xml Obj
          */
-        fun <T> parseObject(@NotNull obj: T): Optional<Node> {
+        fun <T> convertObject(@NotNull obj: T): Optional<Node> {
             require(obj != null) { "The value must be different from null" }
             val kClass = obj!!::class
             // check XmlIgnore

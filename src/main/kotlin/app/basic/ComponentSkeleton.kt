@@ -63,6 +63,8 @@ class ComponentSkeleton(val node: NestedNode) : JPanel() {
                     val parentNode = (parent as ComponentSkeleton)
                     parentNode.node.elements.remove(node)
                     parentNode.remove(this@ComponentSkeleton)
+                    parentNode.repaint()
+                    parentNode.revalidate()
                 }
                 else -> {
                     JOptionPane.showConfirmDialog(null,
