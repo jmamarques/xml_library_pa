@@ -2,6 +2,10 @@ package app.basic
 
 import app.command.Command
 import app.command.attribute.CreateAttributeCommand
+import app.command.attribute.DeleteAttributeCommand
+import app.command.skeleton.CreateNodeCommand
+import app.command.skeleton.DeleteNodeCommand
+import app.command.skeleton.NodeNameCommand
 import structure.IObservable
 import structure.NestedNode
 import structure.XmlAttribute
@@ -40,9 +44,7 @@ class ComponentSkeleton(val node: NestedNode, override val observers: MutableLis
         rename.addActionListener {
             val text = JOptionPane.showInputDialog("entity name")
             if (XmlUtil.isValidEntityName(text)) {
-                node.name = text
-                repaint()
-                revalidate()
+                notifyObservers {it.execute(NodeNameCommand(text, node.name, node, this))}
             } else {
                 JOptionPane.showConfirmDialog(
                     null,
@@ -67,10 +69,7 @@ class ComponentSkeleton(val node: NestedNode, override val observers: MutableLis
         addTag.addActionListener {
             val text = JOptionPane.showInputDialog("tag name")
             if (XmlUtil.isValidEntityName(text)) {
-                val nestedNode = NestedNode(name = text, mutableListOf(), mutableListOf())
-                node.elements.add(nestedNode)
-                add(ComponentSkeleton(nestedNode, observers))
-                revalidate()
+                notifyObservers {it.execute(CreateNodeCommand(ComponentSkeleton(NestedNode(name = text, mutableListOf(), mutableListOf()), observers), node.elements, this))}
             } else {
                 JOptionPane.showConfirmDialog(
                     null,
@@ -84,10 +83,7 @@ class ComponentSkeleton(val node: NestedNode, override val observers: MutableLis
             when (parent::class) {
                 ComponentSkeleton::class -> {
                     val parentNode = (parent as ComponentSkeleton)
-                    parentNode.node.elements.remove(node)
-                    parentNode.remove(this@ComponentSkeleton)
-                    parentNode.repaint()
-                    parentNode.revalidate()
+                    notifyObservers {it.execute(DeleteNodeCommand(this@ComponentSkeleton, parentNode.node.elements, parentNode))}
                 }
                 else -> {
                     JOptionPane.showConfirmDialog(
