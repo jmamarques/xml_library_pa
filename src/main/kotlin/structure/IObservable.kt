@@ -9,7 +9,9 @@ interface IObservable<O> {
     val observers: MutableList<O>
 
     fun addObserver(observer: O) {
-        observers.add(observer)
+        if (!observers.contains(observer)){
+            observers.add(observer)
+        }
     }
 
     fun removeObserver(observer: O) {

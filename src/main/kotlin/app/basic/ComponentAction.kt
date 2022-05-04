@@ -11,7 +11,7 @@ import javax.swing.JPanel
 class ComponentAction(override val observers: MutableList<ActionEvent> = mutableListOf()) : JPanel(), IObservable<ComponentAction.ActionEvent> {
     interface ActionEvent {
         fun add(){}
-        fun rendo(){}
+        fun redo(){}
         fun undo(){}
     }
     init {
@@ -20,8 +20,8 @@ class ComponentAction(override val observers: MutableList<ActionEvent> = mutable
         add(button("save") {
             notifyObservers { it.add() }
         })
-        add(button("rendo") {
-            notifyObservers { it.rendo() }
+        add(button("redo") {
+            notifyObservers { it.redo() }
         })
         add(button("undo") {
             notifyObservers { it.undo() }

@@ -1,5 +1,7 @@
 package app.basic
 
+import app.command.Command
+import structure.IObservable
 import structure.NestedNode
 import structure.XmlAttribute
 import util.XmlUtil
@@ -15,7 +17,11 @@ import javax.swing.border.CompoundBorder
 /**
  * JMA - 02/05/2022 22:53
  **/
-class ComponentSkeleton(val node: NestedNode) : JPanel() {
+class ComponentSkeleton(val node: NestedNode) : JPanel(), IObservable<Command> {
+
+    private val mutableListOf: MutableList<Command> = mutableListOf()
+    override val observers: MutableList<Command>
+        get() = mutableListOf
 
     override fun paintComponent(g: Graphics) {
         super.paintComponent(g)
@@ -52,7 +58,9 @@ class ComponentSkeleton(val node: NestedNode) : JPanel() {
             val text = JOptionPane.showInputDialog("attribute name")
             if (XmlUtil.isValidEntityName(text)) {
                 val attribute = XmlAttribute(text)
-                add(ComponentAttribute(attribute))
+                val componentAttribute = ComponentAttribute(attribute)
+                if( observers.isNotEmpty()) componentAttribute.addObserver(observers[0])
+                add(componentAttribute)
                 node.attributes.add(attribute)
                 revalidate()
             } else {

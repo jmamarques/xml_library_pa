@@ -1,6 +1,9 @@
 package app.basic
 
+import app.command.Command
+import structure.IObservable
 import structure.XmlAttribute
+import app.command.AttributeValueCommand
 import util.XmlUtil
 import java.awt.event.KeyEvent
 import java.awt.event.KeyListener
@@ -10,9 +13,14 @@ import javax.swing.*
 
 /**
  * JMA - 03/05/2022 22:58
- * Component responsible for XML
+ * Component responsible for XML attribute
  **/
-class ComponentAttribute(val attribute: XmlAttribute) : JPanel() {
+class ComponentAttribute(val attribute: XmlAttribute) : JPanel(), IObservable<Command> {
+
+    private val mutableListOf: MutableList<Command> = mutableListOf()
+    override val observers: MutableList<Command>
+        get() = mutableListOf
+
     init {
         val jTextField = JTextField(5)
         jTextField.let {
@@ -27,6 +35,8 @@ class ComponentAttribute(val attribute: XmlAttribute) : JPanel() {
             override fun keyTyped(e: KeyEvent?) {}
             override fun keyPressed(e: KeyEvent?) {}
             override fun keyReleased(e: KeyEvent?) {
+                // command
+                notifyObservers {it.execute(AttributeValueCommand(jTextField.text, attribute.value, attribute, jTextField))}
                 attribute.value = jTextField.text
             }
         })

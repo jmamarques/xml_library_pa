@@ -2,9 +2,8 @@ package app
 
 import app.basic.ComponentAction
 import app.basic.ComponentSkeleton
-import structure.Command
+import app.command.Command
 import structure.NestedNode
-import structure.Node
 import util.XmlUtil
 import java.awt.BorderLayout
 import java.awt.Dimension
@@ -16,7 +15,7 @@ import javax.swing.JOptionPane
 /**
  * JMA - 02/05/2022 22:37
  **/
-class XmlWindow : JFrame("Xml App"), ComponentAction.ActionEvent{
+class XmlWindow : JFrame("Xml App"), ComponentAction.ActionEvent, Command {
     private var stack: Stack<Command> = Stack()
     private var reverse: Stack<Command> = Stack()
     private val root: NestedNode = NestedNode("root", mutableListOf(), mutableListOf())
@@ -24,8 +23,9 @@ class XmlWindow : JFrame("Xml App"), ComponentAction.ActionEvent{
     init {
         defaultCloseOperation = EXIT_ON_CLOSE
         size = Dimension(1024, 400)
-
-        add(ComponentSkeleton(root))
+        val componentSkeleton = ComponentSkeleton(root)
+        componentSkeleton.addObserver(this)
+        add(componentSkeleton)
         val componentAction = ComponentAction()
         componentAction.addObserver(this)
         add(componentAction, BorderLayout.SOUTH)
@@ -49,27 +49,36 @@ class XmlWindow : JFrame("Xml App"), ComponentAction.ActionEvent{
         println("add")
     }
 
-    override fun rendo() {
+    override fun redo() {
         if (!reverse.isEmpty()){
             val action = reverse.pop()
-            action.execute { action }
+            action.execute(action)
             stack.push(action)
         } else{
             JOptionPane.showConfirmDialog(null,
                 "Não tem elementos na pilha de execução", "Info - Rendo", JOptionPane.DEFAULT_OPTION)
         }
-        println("rendo")
+        println("redo")
     }
 
     override fun undo() {
         if (!stack.isEmpty()){
             val action = stack.pop()
-            action.undo()
+            action.undos()
             reverse.push(action)
         } else {
             JOptionPane.showConfirmDialog(null,
                 "Não tem elementos na pilha de execução", "Info - Undo", JOptionPane.DEFAULT_OPTION)
         }
         println("undo")
+    }
+
+    override fun execute(action: Command) {
+//        action.execute(action)
+        stack.push(action)
+        println("action executed on XML Window")
+    }
+
+    override fun undos() {
     }
 }
