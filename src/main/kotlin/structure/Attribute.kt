@@ -5,5 +5,5 @@ package structure
  **/
 interface Attribute {
     fun name(): String
-    fun value(): String
+    fun value(): String = ""
 }
