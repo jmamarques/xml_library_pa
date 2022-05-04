@@ -1,6 +1,7 @@
 package app.basic
 
 import structure.XmlAttribute
+import util.XmlUtil
 import java.awt.event.KeyEvent
 import java.awt.event.KeyListener
 import java.awt.event.MouseAdapter
@@ -22,7 +23,7 @@ class ComponentAttribute(val attribute: XmlAttribute) : JPanel() {
             attribute.value = jTextField.text
         }
         // Listeners by key release
-        jTextField.addKeyListener(object: KeyListener{
+        jTextField.addKeyListener(object : KeyListener {
             override fun keyTyped(e: KeyEvent?) {}
             override fun keyPressed(e: KeyEvent?) {}
             override fun keyReleased(e: KeyEvent?) {
@@ -41,16 +42,23 @@ class ComponentAttribute(val attribute: XmlAttribute) : JPanel() {
         val rename = JMenuItem("Rename")
         rename.addActionListener {
             val text = JOptionPane.showInputDialog("attribute name")
-            attribute.name = text
-            val jLabel = this.getComponent(0) as JLabel
-            jLabel.text = text
-            repaint()
-            revalidate()
+            if (XmlUtil.isValidEntityName(text)) {
+                attribute.name = text
+                val jLabel = this.getComponent(0) as JLabel
+                jLabel.text = text
+                repaint()
+                revalidate()
+            } else {
+                JOptionPane.showConfirmDialog(
+                    null,
+                    "Nome não respeita a syntax do XML", "Error", JOptionPane.DEFAULT_OPTION
+                )
+            }
         }
         val delete = JMenuItem("Delete")
         delete.addActionListener {
             val parent = this.parent
-            when(parent::class){
+            when (parent::class) {
                 ComponentSkeleton::class -> {
                     val parentNode = (parent as ComponentSkeleton)
                     parentNode.node.attributes.remove(attribute)
@@ -59,8 +67,10 @@ class ComponentAttribute(val attribute: XmlAttribute) : JPanel() {
                     parentNode.revalidate()
                 }
                 else -> {
-                    JOptionPane.showConfirmDialog(null,
-                        "Nada para apagar", "Info", JOptionPane.DEFAULT_OPTION)
+                    JOptionPane.showConfirmDialog(
+                        null,
+                        "Nada para apagar", "Info", JOptionPane.DEFAULT_OPTION
+                    )
                 }
             }
             revalidate()

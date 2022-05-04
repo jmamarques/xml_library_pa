@@ -69,7 +69,7 @@ class XmlConverter {
             val xmlName = kClass.annotations.find { it.annotationClass == XmlName::class }
             val propName =
                 if (xmlName != null && (xmlName as XmlName).name.isNotBlank()) xmlName.name else name
-            require(isValidEntityName(propName)) { "Entity shouldn't contain white spaces" }
+            require(isValidEntityName(propName)) { "Entity shouldn't contain white spaces or invalid format" }
             // create
             return LeafNode(name = escapingChar(propName), escapingChar("$obj"), mutableListOf())
         }
@@ -87,7 +87,7 @@ class XmlConverter {
             var propName =
                 if (xmlName != null && (xmlName as XmlName).name.isNotBlank()) xmlName.name else if (name.isNotBlank()) name else kClass.simpleName
             if (kClass.simpleName == null) propName = "anonymous"
-            require(isValidEntityName(propName)) { "Entity shouldn't contain white spaces" }
+            require(isValidEntityName(propName)) { "Entity shouldn't contain white spaces or invalid format" }
             val elements = mutableListOf<Node>()
             val root = NestedNode(escapingChar(propName), elements, mutableListOf())
             // Load all properties

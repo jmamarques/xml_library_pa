@@ -2,6 +2,7 @@ package app.basic
 
 import structure.NestedNode
 import structure.XmlAttribute
+import util.XmlUtil
 import java.awt.Color
 import java.awt.Font
 import java.awt.Graphics
@@ -35,30 +36,51 @@ class ComponentSkeleton(val node: NestedNode) : JPanel() {
         val rename = JMenuItem("Rename")
         rename.addActionListener {
             val text = JOptionPane.showInputDialog("entity name")
-            node.name = text
-            repaint()
-            revalidate()
+            if (XmlUtil.isValidEntityName(text)) {
+                node.name = text
+                repaint()
+                revalidate()
+            } else {
+                JOptionPane.showConfirmDialog(
+                    null,
+                    "Nome não respeita a syntax do XML", "Error", JOptionPane.DEFAULT_OPTION
+                )
+            }
         }
         val addAttribute = JMenuItem("Add Attribute")
         addAttribute.addActionListener {
             val text = JOptionPane.showInputDialog("attribute name")
-            val attribute = XmlAttribute(text)
-            add(ComponentAttribute(attribute))
-            node.attributes.add(attribute)
-            revalidate()
+            if (XmlUtil.isValidEntityName(text)) {
+                val attribute = XmlAttribute(text)
+                add(ComponentAttribute(attribute))
+                node.attributes.add(attribute)
+                revalidate()
+            } else {
+                JOptionPane.showConfirmDialog(
+                    null,
+                    "Nome não respeita a syntax do XML", "Error", JOptionPane.DEFAULT_OPTION
+                )
+            }
         }
         val addTag = JMenuItem("Add Tag")
         addTag.addActionListener {
             val text = JOptionPane.showInputDialog("tag name")
-            val nestedNode = NestedNode(name = text, mutableListOf(), mutableListOf())
-            node.elements.add(nestedNode)
-            add(ComponentSkeleton(nestedNode))
-            revalidate()
+            if (XmlUtil.isValidEntityName(text)) {
+                val nestedNode = NestedNode(name = text, mutableListOf(), mutableListOf())
+                node.elements.add(nestedNode)
+                add(ComponentSkeleton(nestedNode))
+                revalidate()
+            } else {
+                JOptionPane.showConfirmDialog(
+                    null,
+                    "Nome não respeita a syntax do XML", "Error", JOptionPane.DEFAULT_OPTION
+                )
+            }
         }
         val delete = JMenuItem("Delete")
         delete.addActionListener {
             val parent = this.parent
-            when(parent::class){
+            when (parent::class) {
                 ComponentSkeleton::class -> {
                     val parentNode = (parent as ComponentSkeleton)
                     parentNode.node.elements.remove(node)
@@ -67,8 +89,10 @@ class ComponentSkeleton(val node: NestedNode) : JPanel() {
                     parentNode.revalidate()
                 }
                 else -> {
-                    JOptionPane.showConfirmDialog(null,
-                        "Não pode apagar root element", "Error", JOptionPane.DEFAULT_OPTION)
+                    JOptionPane.showConfirmDialog(
+                        null,
+                        "Não pode apagar root element", "Error", JOptionPane.DEFAULT_OPTION
+                    )
                 }
             }
             revalidate()

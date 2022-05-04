@@ -32,7 +32,7 @@ class XmlUtil {
          * Check if a string contains white spaces for entity name
          */
         fun isValidEntityName(v: String?): Boolean {
-            return v != null && !v.contains(Regex("\\s+"))
+            return v != null && !v.contains(Regex("\\s+")) && !v.contains(Regex("^\\d"))
         }
 
         /**
@@ -42,6 +42,15 @@ class XmlUtil {
             val xxx = XmlToString()
             obj.accept(xxx)
             println(xxx.toString())
+        }
+
+        /**
+         * to String of XML object
+         */
+        fun toStringXml(obj: Node): String {
+            val xxx = XmlToString()
+            obj.accept(xxx)
+            return xxx.toString()
         }
     }
 }
