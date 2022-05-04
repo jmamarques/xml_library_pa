@@ -1,24 +1,30 @@
 package app.basic
 
 import apptest.button
+import structure.IObservable
 import java.awt.Dimension
 import javax.swing.JPanel
 
 /**
  * JMA - 02/05/2022 23:51
  **/
-class ComponentAction() : JPanel() {
+class ComponentAction(override val observers: MutableList<ActionEvent> = mutableListOf()) : JPanel(), IObservable<ComponentAction.ActionEvent> {
+    interface ActionEvent {
+        fun add(){}
+        fun rendo(){}
+        fun undo(){}
+    }
     init {
         size = Dimension(20, 20)
 
         add(button("save") {
-            TODO("FIRE EVENT SAVE")
+            notifyObservers { it.add() }
         })
         add(button("rendo") {
-            TODO("FIRE EVENT RENDO")
+            notifyObservers { it.rendo() }
         })
         add(button("undo") {
-            TODO("FIRE EVENT UNDO")
+            notifyObservers { it.undo() }
         })
 
     }
