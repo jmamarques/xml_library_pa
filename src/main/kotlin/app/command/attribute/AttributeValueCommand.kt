@@ -1,5 +1,6 @@
-package app.command
+package app.command.attribute
 
+import app.command.Command
 import structure.XmlAttribute
 import javax.swing.JTextField
 

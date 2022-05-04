@@ -1,6 +1,7 @@
 package app.basic
 
 import app.command.Command
+import app.command.attribute.CreateAttributeCommand
 import structure.IObservable
 import structure.NestedNode
 import structure.XmlAttribute
@@ -17,11 +18,7 @@ import javax.swing.border.CompoundBorder
 /**
  * JMA - 02/05/2022 22:53
  **/
-class ComponentSkeleton(val node: NestedNode) : JPanel(), IObservable<Command> {
-
-    private val mutableListOf: MutableList<Command> = mutableListOf()
-    override val observers: MutableList<Command>
-        get() = mutableListOf
+class ComponentSkeleton(val node: NestedNode, override val observers: MutableList<Command> = mutableListOf()) : JPanel(), IObservable<Command> {
 
     override fun paintComponent(g: Graphics) {
         super.paintComponent(g)
@@ -58,11 +55,7 @@ class ComponentSkeleton(val node: NestedNode) : JPanel(), IObservable<Command> {
             val text = JOptionPane.showInputDialog("attribute name")
             if (XmlUtil.isValidEntityName(text)) {
                 val attribute = XmlAttribute(text)
-                val componentAttribute = ComponentAttribute(attribute)
-                if( observers.isNotEmpty()) componentAttribute.addObserver(observers[0])
-                add(componentAttribute)
-                node.attributes.add(attribute)
-                revalidate()
+                notifyObservers {it.execute(CreateAttributeCommand(ComponentAttribute(attribute, observers), node.attributes, this))}
             } else {
                 JOptionPane.showConfirmDialog(
                     null,
@@ -76,7 +69,7 @@ class ComponentSkeleton(val node: NestedNode) : JPanel(), IObservable<Command> {
             if (XmlUtil.isValidEntityName(text)) {
                 val nestedNode = NestedNode(name = text, mutableListOf(), mutableListOf())
                 node.elements.add(nestedNode)
-                add(ComponentSkeleton(nestedNode))
+                add(ComponentSkeleton(nestedNode, observers))
                 revalidate()
             } else {
                 JOptionPane.showConfirmDialog(

@@ -23,9 +23,9 @@ class XmlWindow : JFrame("Xml App"), ComponentAction.ActionEvent, Command {
     init {
         defaultCloseOperation = EXIT_ON_CLOSE
         size = Dimension(1024, 400)
-        val componentSkeleton = ComponentSkeleton(root)
-        componentSkeleton.addObserver(this)
-        add(componentSkeleton)
+
+        add(ComponentSkeleton(root, mutableListOf(this)))
+
         val componentAction = ComponentAction()
         componentAction.addObserver(this)
         add(componentAction, BorderLayout.SOUTH)
@@ -74,7 +74,7 @@ class XmlWindow : JFrame("Xml App"), ComponentAction.ActionEvent, Command {
     }
 
     override fun execute(action: Command) {
-//        action.execute(action)
+        action.execute(action)
         stack.push(action)
         println("action executed on XML Window")
     }

@@ -1,9 +1,11 @@
 package app.basic
 
-import app.command.Command
+import app.command.*
+import app.command.attribute.AttributeNameCommand
+import app.command.attribute.AttributeValueCommand
+import app.command.attribute.DeleteAttributeCommand
 import structure.IObservable
 import structure.XmlAttribute
-import app.command.AttributeValueCommand
 import util.XmlUtil
 import java.awt.event.KeyEvent
 import java.awt.event.KeyListener
@@ -15,11 +17,7 @@ import javax.swing.*
  * JMA - 03/05/2022 22:58
  * Component responsible for XML attribute
  **/
-class ComponentAttribute(val attribute: XmlAttribute) : JPanel(), IObservable<Command> {
-
-    private val mutableListOf: MutableList<Command> = mutableListOf()
-    override val observers: MutableList<Command>
-        get() = mutableListOf
+class ComponentAttribute(val attribute: XmlAttribute,override val observers: MutableList<Command> = mutableListOf()) : JPanel(), IObservable<Command> {
 
     init {
         val jTextField = JTextField(5)
@@ -28,7 +26,7 @@ class ComponentAttribute(val attribute: XmlAttribute) : JPanel(), IObservable<Co
         }
         // Listeners by action
         jTextField.addActionListener {
-            attribute.value = jTextField.text
+            notifyObservers {it.execute(AttributeValueCommand(jTextField.text, attribute.value, attribute, jTextField))}
         }
         // Listeners by key release
         jTextField.addKeyListener(object : KeyListener {
@@ -37,11 +35,11 @@ class ComponentAttribute(val attribute: XmlAttribute) : JPanel(), IObservable<Co
             override fun keyReleased(e: KeyEvent?) {
                 // command
                 notifyObservers {it.execute(AttributeValueCommand(jTextField.text, attribute.value, attribute, jTextField))}
-                attribute.value = jTextField.text
             }
         })
         // add components to JPanel
-        this.add(JLabel(attribute.name()))
+        val jLabel = JLabel(attribute.name())
+        this.add(jLabel)
         this.add(Box.createVerticalStrut(15))
         this.add(jTextField)
         createPopupMenu()
@@ -53,11 +51,9 @@ class ComponentAttribute(val attribute: XmlAttribute) : JPanel(), IObservable<Co
         rename.addActionListener {
             val text = JOptionPane.showInputDialog("attribute name")
             if (XmlUtil.isValidEntityName(text)) {
-                attribute.name = text
                 val jLabel = this.getComponent(0) as JLabel
-                jLabel.text = text
-                repaint()
-                revalidate()
+                val attributeNameCommand = AttributeNameCommand(text, attribute.name, attribute, jLabel)
+                notifyObservers {it.execute(attributeNameCommand)}
             } else {
                 JOptionPane.showConfirmDialog(
                     null,
@@ -71,10 +67,7 @@ class ComponentAttribute(val attribute: XmlAttribute) : JPanel(), IObservable<Co
             when (parent::class) {
                 ComponentSkeleton::class -> {
                     val parentNode = (parent as ComponentSkeleton)
-                    parentNode.node.attributes.remove(attribute)
-                    parentNode.remove(this@ComponentAttribute)
-                    parentNode.repaint()
-                    parentNode.revalidate()
+                    notifyObservers {it.execute(DeleteAttributeCommand(this@ComponentAttribute, parentNode.node.attributes, parentNode))}
                 }
                 else -> {
                     JOptionPane.showConfirmDialog(
