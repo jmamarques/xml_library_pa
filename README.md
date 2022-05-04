@@ -57,8 +57,12 @@ As anotações que auxiliam nessa acção são: [@XmlIgnore](src/main/kotlin/ann
 * 5- O XmlIgnore ignora o item
 * 6- O XmlTagContent indica que é o unico conteudo daquela class
 
-## Parser from Object to XML Object
+## Converter from Object to XML Object
 ```kotlin
 val prototypeI = PrototypeI()
-val parseObject = XmlParser.parseObject(prototypeI)
+val convertedObject = XmlConverter.convertObject(prototypeI)
 ```
+
+## APP de XML 
+
+Pode encontrar uma app para construção de XML e guardar num ficheiro. Para a construcao dessa APP foram usados padros de desenho nomeadamente command e obvervable
