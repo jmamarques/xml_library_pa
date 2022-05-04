@@ -3,10 +3,9 @@ package app.basic
 import structure.XmlAttribute
 import java.awt.event.KeyEvent
 import java.awt.event.KeyListener
-import javax.swing.Box
-import javax.swing.JLabel
-import javax.swing.JPanel
-import javax.swing.JTextField
+import java.awt.event.MouseAdapter
+import java.awt.event.MouseEvent
+import javax.swing.*
 
 /**
  * JMA - 03/05/2022 22:58
@@ -34,5 +33,49 @@ class ComponentAttribute(val attribute: XmlAttribute) : JPanel() {
         this.add(JLabel(attribute.name()))
         this.add(Box.createVerticalStrut(15))
         this.add(jTextField)
+        createPopupMenu()
+    }
+
+
+    private fun createPopupMenu() {
+        val rename = JMenuItem("Rename")
+        rename.addActionListener {
+            val text = JOptionPane.showInputDialog("attribute name")
+            attribute.name = text
+            val jLabel = this.getComponent(0) as JLabel
+            jLabel.text = text
+            repaint()
+            revalidate()
+        }
+        val delete = JMenuItem("Delete")
+        delete.addActionListener {
+            val parent = this.parent
+            when(parent::class){
+                ComponentSkeleton::class -> {
+                    val parentNode = (parent as ComponentSkeleton)
+                    parentNode.node.attributes.remove(attribute)
+                    parentNode.remove(this@ComponentAttribute)
+                    parentNode.repaint()
+                    parentNode.revalidate()
+                }
+                else -> {
+                    JOptionPane.showConfirmDialog(null,
+                        "Nada para apagar", "Info", JOptionPane.DEFAULT_OPTION)
+                }
+            }
+            revalidate()
+        }
+
+        val popupmenu = JPopupMenu("AttributeActions")
+        popupmenu.add(rename)
+        popupmenu.add(delete)
+
+
+        addMouseListener(object : MouseAdapter() {
+            override fun mouseClicked(e: MouseEvent) {
+                if (SwingUtilities.isRightMouseButton(e))
+                    popupmenu.show(this@ComponentAttribute, e.x, e.y)
+            }
+        })
     }
 }

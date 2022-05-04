@@ -14,8 +14,12 @@ class ComponentAction() : JPanel() {
         add(button("save") {
             TODO("FIRE EVENT SAVE")
         })
+        add(button("rendo") {
+            TODO("FIRE EVENT RENDO")
+        })
         add(button("undo") {
             TODO("FIRE EVENT UNDO")
         })
+
     }
 }

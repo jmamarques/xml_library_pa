@@ -34,7 +34,7 @@ class ComponentSkeleton(val node: NestedNode) : JPanel() {
     private fun createPopupMenu() {
         val rename = JMenuItem("Rename")
         rename.addActionListener {
-            val text = JOptionPane.showInputDialog("attribute name")
+            val text = JOptionPane.showInputDialog("entity name")
             node.name = text
             repaint()
             revalidate()
