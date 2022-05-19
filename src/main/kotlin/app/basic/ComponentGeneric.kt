@@ -3,12 +3,9 @@ package app.basic
 import app.command.Command
 import app.command.attribute.CreateAttributeCommand
 import app.command.skeleton.CreateNodeCommand
-import app.command.skeleton.DeleteNodeCommand
+import app.command.skeleton.DeleteNodeGCommand
 import app.command.skeleton.NodeNameCommand
-import impl.XmlDependencyInjection
-import structure.IObservable
-import structure.NestedNode
-import structure.XmlAttribute
+import structure.*
 import util.XmlUtil
 import java.awt.Color
 import java.awt.Font
@@ -20,11 +17,19 @@ import javax.swing.*
 import javax.swing.border.CompoundBorder
 
 /**
- * JMA - 02/05/2022 22:53
+ * JMA - 19/05/2022 19:29
  **/
-class ComponentSkeleton(val node: NestedNode, override val observers: MutableList<Command> = mutableListOf()) :
-    JPanel(),
-    IObservable<Command> {
+open class ComponentGeneric: JPanel(), IObservable<Command> {
+    open val node: NestedNode = NestedNode("event", mutableListOf(), mutableListOf())
+    override val observers: MutableList<Command> = mutableListOf()
+
+    @InjectAdd
+    var jComponents = mutableListOf<ComponentAttributeG>()
+
+    fun addObservers(list: MutableList<Command>){
+        list.forEach { addObserver(it) }
+        list.forEach { jComponents.forEach{ v -> v.addObserver(it)} }
+    }
 
     override fun paintComponent(g: Graphics) {
         super.paintComponent(g)
@@ -41,7 +46,7 @@ class ComponentSkeleton(val node: NestedNode, override val observers: MutableLis
         createPopupMenu()
     }
 
-    private fun createPopupMenu() {
+    open fun createPopupMenu(){
         val rename = JMenuItem("Rename")
         rename.addActionListener {
             val text = JOptionPane.showInputDialog("entity name")
@@ -88,7 +93,7 @@ class ComponentSkeleton(val node: NestedNode, override val observers: MutableLis
                                     mutableListOf(),
                                     mutableListOf()
                                 ), observers
-                            ), node.elements, this
+                            ), node.elements, this@ComponentGeneric
                         )
                     )
                 }
@@ -107,8 +112,8 @@ class ComponentSkeleton(val node: NestedNode, override val observers: MutableLis
                     val parentNode = (parent as ComponentSkeleton)
                     notifyObservers {
                         it.execute(
-                            DeleteNodeCommand(
-                                this@ComponentSkeleton,
+                            DeleteNodeGCommand(
+                                this@ComponentGeneric,
                                 parentNode.node.elements,
                                 parentNode
                             )
@@ -126,16 +131,10 @@ class ComponentSkeleton(val node: NestedNode, override val observers: MutableLis
         }
 
         val addPlugin = JMenuItem("Add Event")
+        addPlugin.isEnabled = false
         addPlugin.addActionListener {
-            val a = XmlDependencyInjection.create()
-            a.addObservers(observers)
-            add(a)
             repaint()
             revalidate()
-            /*comp.observers.addAll(observers)
-            jComponents.forEach { comp.add(it) }
-            repaint()
-            revalidate()*/
         }
 
         val popupmenu = JPopupMenu("Actions")
@@ -149,11 +148,8 @@ class ComponentSkeleton(val node: NestedNode, override val observers: MutableLis
         addMouseListener(object : MouseAdapter() {
             override fun mouseClicked(e: MouseEvent) {
                 if (SwingUtilities.isRightMouseButton(e))
-                    popupmenu.show(this@ComponentSkeleton, e.x, e.y)
+                    popupmenu.show(this@ComponentGeneric, e.x, e.y)
             }
         })
     }
-
 }
-
-

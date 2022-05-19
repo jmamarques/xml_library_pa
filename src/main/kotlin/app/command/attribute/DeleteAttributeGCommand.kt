@@ -1,18 +1,18 @@
-package app.command.skeleton
+package app.command.attribute
 
-import app.basic.ComponentGeneric
-import app.basic.ComponentSkeleton
+import app.basic.ComponentAttribute
+import app.basic.ComponentAttributeG
 import app.command.Command
-import structure.Node
+import structure.Attribute
 import javax.swing.JComponent
 
 /**
  * JMA - 04/05/2022 19:40
  **/
-class DeleteNodeCommand(val component: ComponentSkeleton, val elements: MutableList<Node>, val parentComp: JComponent):
+class DeleteAttributeGCommand(val component: ComponentAttributeG, val attributes: MutableList<Attribute>, val parentComp: JComponent):
     Command {
     override fun execute(action: Command) {
-        elements.remove(component.node)
+        attributes.remove(component.attribute)
         parentComp.remove(component)
         parentComp.repaint()
         parentComp.revalidate()
@@ -20,7 +20,7 @@ class DeleteNodeCommand(val component: ComponentSkeleton, val elements: MutableL
 
     override fun undos() {
         parentComp.add(component)
-        elements.add(component.node)
+        attributes.add(component.attribute)
         parentComp.repaint()
         parentComp.revalidate()
     }

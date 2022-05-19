@@ -1,5 +1,6 @@
 package app.command.skeleton
 
+import app.basic.ComponentGeneric
 import app.basic.ComponentSkeleton
 import app.command.Command
 import structure.Node
