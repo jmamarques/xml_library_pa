@@ -12,6 +12,7 @@ import java.io.FileInputStream
 import java.util.*
 import kotlin.reflect.KClass
 import kotlin.reflect.KMutableProperty
+import kotlin.reflect.KProperty1
 import kotlin.reflect.full.createInstance
 import kotlin.reflect.full.declaredMemberProperties
 import kotlin.reflect.full.hasAnnotation
@@ -53,22 +54,46 @@ class XmlDependencyInjection {
                 ?: throw Exception("Fill configuration file xml.properties")
             val clazz: KClass<*> = Class.forName(property).kotlin
             val obj = clazz.createInstance()
+            var wasPopulated = false
 
             clazz.declaredMemberProperties.filter { it.hasAnnotation<InjectAdd>() }
                 .forEach {
-                    val clazz: KClass<*> = Class.forName(property).kotlin
-                    if(clazz != ComponentGeneric::class && clazz.java.superclass != ComponentGeneric::class.java) throw Exception("Invalid Component")
-                    it.isAccessible = true
-                    val call = (it as KMutableProperty<*>).getter.call(obj)
-                    val props = loadProperties.getProperty("Xml.attributes")
-                    props?.split(",")?.forEach { v->
-                        val c: KClass<*> = Class.forName(v).kotlin
-                        if(c != ComponentAttributeG::class && c.java.superclass != ComponentAttributeG::class.java) throw Exception("Invalid Attribute Component")
-                        val o = c.createInstance() as ComponentAttributeG
-                        (call as MutableList<ComponentAttributeG>).add(o)
-                    }
+                    populateInjectAdd(wasPopulated, property, it as KProperty1<ComponentGeneric, *>, obj, loadProperties)
                 }
+            // on super class
+            if( !wasPopulated && clazz.java.superclass == ComponentGeneric::class.java){
+                ComponentGeneric::class.declaredMemberProperties.filter { it.hasAnnotation<InjectAdd>() }
+                    .forEach {
+                        populateInjectAdd(wasPopulated, property, it, obj, loadProperties)
+                    }
+            }
             return obj as ComponentGeneric
+        }
+
+        private fun populateInjectAdd(
+            wasPopulated: Boolean,
+            property: String,
+            it: KProperty1<ComponentGeneric, *>,
+            obj: Any,
+            loadProperties: Properties
+        ) {
+            var wasPopulated1 = wasPopulated
+            wasPopulated1 = true
+            val clazz: KClass<*> = Class.forName(property).kotlin
+            if (clazz != ComponentGeneric::class && clazz.java.superclass != ComponentGeneric::class.java) throw Exception(
+                "Invalid Component"
+            )
+            it.isAccessible = true
+            val call = (it as KMutableProperty<*>).getter.call(obj)
+            val props = loadProperties.getProperty("Xml.attributes")
+            props?.split(",")?.forEach { v ->
+                val c: KClass<*> = Class.forName(v).kotlin
+                if (c != ComponentAttributeG::class && c.java.superclass != ComponentAttributeG::class.java) throw Exception(
+                    "Invalid Attribute Component"
+                )
+                val o = c.createInstance() as ComponentAttributeG
+                (call as MutableList<ComponentAttributeG>).add(o)
+            }
         }
     }
 

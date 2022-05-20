@@ -41,6 +41,10 @@ open class ComponentGeneric : JPanel(), IObservable<Command> {
     }
 
     init {
+        init()
+    }
+
+    open fun init() {
         layout = GridLayout(0, 3)
         border = CompoundBorder(
             BorderFactory.createEmptyBorder(30, 10, 10, 10),
