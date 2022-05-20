@@ -66,3 +66,15 @@ val convertedObject = XmlConverter.convertObject(prototypeI)
 ## APP de XML 
 
 Pode encontrar uma app para construção de XML e guardar num ficheiro. Para a construcao dessa APP foram usados padros de desenho nomeadamente command e obvervable
+
+## Base class para Fase 4
+
+```kotlin
+class ComponentTextAttribute: ComponentAttributeG() {
+    override fun init() {
+        attribute.name = "description"
+        attribute.value = "última aula de PA"
+        super.init()
+    }
+}
+```
