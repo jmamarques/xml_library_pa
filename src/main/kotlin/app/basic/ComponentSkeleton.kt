@@ -2,6 +2,7 @@ package app.basic
 
 import app.command.Command
 import app.command.attribute.CreateAttributeCommand
+import app.command.skeleton.CreateGenericNodeCommand
 import app.command.skeleton.CreateNodeCommand
 import app.command.skeleton.DeleteNodeCommand
 import app.command.skeleton.NodeNameCommand
@@ -115,6 +116,18 @@ class ComponentSkeleton(val node: NestedNode, override val observers: MutableLis
                         )
                     }
                 }
+                ComponentGeneric::class -> {
+                    val parentNode = (parent as ComponentGeneric)
+                    notifyObservers {
+                        it.execute(
+                            DeleteNodeCommand(
+                                this@ComponentSkeleton,
+                                parentNode.node.elements,
+                                parentNode
+                            )
+                        )
+                    }
+                }
                 else -> {
                     JOptionPane.showConfirmDialog(
                         null,
@@ -127,11 +140,21 @@ class ComponentSkeleton(val node: NestedNode, override val observers: MutableLis
 
         val addPlugin = JMenuItem("Add Event")
         addPlugin.addActionListener {
-            val a = XmlDependencyInjection.create()
-            a.addObservers(observers)
-            add(a)
-            repaint()
-            revalidate()
+
+            notifyObservers {
+                it.execute(
+                    CreateGenericNodeCommand(
+                        XmlDependencyInjection.create(),
+                        node.elements,
+                        this
+                    )
+                )
+            }
+            /* val a = XmlDependencyInjection.create()
+             a.addObservers(observers)
+             add(a)
+             repaint()
+             revalidate()*/
             /*comp.observers.addAll(observers)
             jComponents.forEach { comp.add(it) }
             repaint()

@@ -5,7 +5,10 @@ import app.command.attribute.CreateAttributeCommand
 import app.command.skeleton.CreateNodeCommand
 import app.command.skeleton.DeleteNodeGCommand
 import app.command.skeleton.NodeNameCommand
-import structure.*
+import structure.IObservable
+import structure.InjectAdd
+import structure.NestedNode
+import structure.XmlAttribute
 import util.XmlUtil
 import java.awt.Color
 import java.awt.Font
@@ -19,16 +22,16 @@ import javax.swing.border.CompoundBorder
 /**
  * JMA - 19/05/2022 19:29
  **/
-open class ComponentGeneric: JPanel(), IObservable<Command> {
+open class ComponentGeneric : JPanel(), IObservable<Command> {
     open val node: NestedNode = NestedNode("event", mutableListOf(), mutableListOf())
     override val observers: MutableList<Command> = mutableListOf()
 
     @InjectAdd
     var jComponents = mutableListOf<ComponentAttributeG>()
 
-    fun addObservers(list: MutableList<Command>){
+    fun addObservers(list: MutableList<Command>) {
         list.forEach { addObserver(it) }
-        list.forEach { jComponents.forEach{ v -> v.addObserver(it)} }
+        list.forEach { jComponents.forEach { v -> v.addObserver(it) } }
     }
 
     override fun paintComponent(g: Graphics) {
@@ -46,7 +49,7 @@ open class ComponentGeneric: JPanel(), IObservable<Command> {
         createPopupMenu()
     }
 
-    open fun createPopupMenu(){
+    open fun createPopupMenu() {
         val rename = JMenuItem("Rename")
         rename.addActionListener {
             val text = JOptionPane.showInputDialog("entity name")
@@ -110,6 +113,18 @@ open class ComponentGeneric: JPanel(), IObservable<Command> {
             when (parent::class) {
                 ComponentSkeleton::class -> {
                     val parentNode = (parent as ComponentSkeleton)
+                    notifyObservers {
+                        it.execute(
+                            DeleteNodeGCommand(
+                                this@ComponentGeneric,
+                                parentNode.node.elements,
+                                parentNode
+                            )
+                        )
+                    }
+                }
+                ComponentGeneric::class -> {
+                    val parentNode = (parent as ComponentGeneric)
                     notifyObservers {
                         it.execute(
                             DeleteNodeGCommand(

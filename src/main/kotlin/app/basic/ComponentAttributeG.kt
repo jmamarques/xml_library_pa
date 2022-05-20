@@ -28,7 +28,16 @@ class ComponentAttributeG : JPanel(), IObservable<Command> {
         }
         // Listeners by action
         jTextField.addActionListener {
-            notifyObservers {it.execute(AttributeValueCommand(jTextField.text, attribute.value, attribute, jTextField))}
+            notifyObservers {
+                it.execute(
+                    AttributeValueCommand(
+                        jTextField.text,
+                        attribute.value,
+                        attribute,
+                        jTextField
+                    )
+                )
+            }
         }
         // Listeners by key release
         jTextField.addKeyListener(object : KeyListener {
@@ -36,7 +45,16 @@ class ComponentAttributeG : JPanel(), IObservable<Command> {
             override fun keyPressed(e: KeyEvent?) {}
             override fun keyReleased(e: KeyEvent?) {
                 // command
-                notifyObservers {it.execute(AttributeValueCommand(jTextField.text, attribute.value, attribute, jTextField))}
+                notifyObservers {
+                    it.execute(
+                        AttributeValueCommand(
+                            jTextField.text,
+                            attribute.value,
+                            attribute,
+                            jTextField
+                        )
+                    )
+                }
             }
         })
         // add components to JPanel
@@ -55,7 +73,7 @@ class ComponentAttributeG : JPanel(), IObservable<Command> {
             if (XmlUtil.isValidEntityName(text)) {
                 val jLabel = this.getComponent(0) as JLabel
                 val attributeNameCommand = AttributeNameCommand(text, attribute.name, attribute, jLabel)
-                notifyObservers {it.execute(attributeNameCommand)}
+                notifyObservers { it.execute(attributeNameCommand) }
             } else {
                 JOptionPane.showConfirmDialog(
                     null,
@@ -69,7 +87,27 @@ class ComponentAttributeG : JPanel(), IObservable<Command> {
             when (parent::class) {
                 ComponentSkeleton::class -> {
                     val parentNode = (parent as ComponentSkeleton)
-                    notifyObservers {it.execute(DeleteAttributeGCommand(this@ComponentAttributeG, parentNode.node.attributes, parentNode))}
+                    notifyObservers {
+                        it.execute(
+                            DeleteAttributeGCommand(
+                                this@ComponentAttributeG,
+                                parentNode.node.attributes,
+                                parentNode
+                            )
+                        )
+                    }
+                }
+                ComponentGeneric::class -> {
+                    val parentNode = (parent as ComponentGeneric)
+                    notifyObservers {
+                        it.execute(
+                            DeleteAttributeGCommand(
+                                this@ComponentAttributeG,
+                                parentNode.node.attributes,
+                                parentNode
+                            )
+                        )
+                    }
                 }
                 else -> {
                     JOptionPane.showConfirmDialog(
@@ -78,6 +116,7 @@ class ComponentAttributeG : JPanel(), IObservable<Command> {
                     )
                 }
             }
+            repaint()
             revalidate()
         }
 

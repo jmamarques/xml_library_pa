@@ -1,6 +1,6 @@
 package app.basic
 
-import app.command.*
+import app.command.Command
 import app.command.attribute.AttributeNameCommand
 import app.command.attribute.AttributeValueCommand
 import app.command.attribute.DeleteAttributeCommand
@@ -67,7 +67,27 @@ class ComponentAttribute(val attribute: XmlAttribute,override val observers: Mut
             when (parent::class) {
                 ComponentSkeleton::class -> {
                     val parentNode = (parent as ComponentSkeleton)
-                    notifyObservers {it.execute(DeleteAttributeCommand(this@ComponentAttribute, parentNode.node.attributes, parentNode))}
+                    notifyObservers {
+                        it.execute(
+                            DeleteAttributeCommand(
+                                this@ComponentAttribute,
+                                parentNode.node.attributes,
+                                parentNode
+                            )
+                        )
+                    }
+                }
+                ComponentGeneric::class -> {
+                    val parentNode = (parent as ComponentGeneric)
+                    notifyObservers {
+                        it.execute(
+                            DeleteAttributeCommand(
+                                this@ComponentAttribute,
+                                parentNode.node.attributes,
+                                parentNode
+                            )
+                        )
+                    }
                 }
                 else -> {
                     JOptionPane.showConfirmDialog(
