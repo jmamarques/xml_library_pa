@@ -150,15 +150,6 @@ class ComponentSkeleton(val node: NestedNode, override val observers: MutableLis
                     )
                 )
             }
-            /* val a = XmlDependencyInjection.create()
-             a.addObservers(observers)
-             add(a)
-             repaint()
-             revalidate()*/
-            /*comp.observers.addAll(observers)
-            jComponents.forEach { comp.add(it) }
-            repaint()
-            revalidate()*/
         }
 
         val popupmenu = JPopupMenu("Actions")
