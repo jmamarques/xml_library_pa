@@ -57,13 +57,13 @@ class XmlDependencyInjection {
             clazz.declaredMemberProperties.filter { it.hasAnnotation<InjectAdd>() }
                 .forEach {
                     val clazz: KClass<*> = Class.forName(property).kotlin
-                    if(clazz != ComponentGeneric::class) throw Exception("Invalid Component")
+                    if(clazz != ComponentGeneric::class && clazz.java.superclass != ComponentGeneric::class.java) throw Exception("Invalid Component")
                     it.isAccessible = true
                     val call = (it as KMutableProperty<*>).getter.call(obj)
                     val props = loadProperties.getProperty("Xml.attributes")
                     props?.split(",")?.forEach { v->
                         val c: KClass<*> = Class.forName(v).kotlin
-                        if(c != ComponentAttributeG::class) throw Exception("Invalid Attribute Component")
+                        if(c != ComponentAttributeG::class && c.java.superclass != ComponentAttributeG::class.java) throw Exception("Invalid Attribute Component")
                         val o = c.createInstance() as ComponentAttributeG
                         (call as MutableList<ComponentAttributeG>).add(o)
                     }

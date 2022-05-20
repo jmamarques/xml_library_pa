@@ -17,6 +17,7 @@ dependencies {
     // https://mvnrepository.com/artifact/org.jetbrains.kotlin/kotlin-reflect
     runtimeOnly("org.jetbrains.kotlin:kotlin-reflect:1.6.21")
     compileOnly("org.jetbrains.kotlin:kotlin-reflect:1.6.21")
+    implementation("org.jdatepicker:jdatepicker:1.3.4")
 
 }
 

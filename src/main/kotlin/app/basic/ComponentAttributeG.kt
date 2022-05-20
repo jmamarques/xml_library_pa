@@ -17,11 +17,15 @@ import javax.swing.*
  * JMA - 03/05/2022 22:58
  * Component responsible for XML attribute
  **/
-class ComponentAttributeG : JPanel(), IObservable<Command> {
-    val attribute: XmlAttribute = XmlAttribute("Generic")
+open class ComponentAttributeG : JPanel(), IObservable<Command> {
+    open val attribute: XmlAttribute = XmlAttribute("Generic")
     override val observers: MutableList<Command> = mutableListOf()
 
     init {
+        init()
+    }
+
+    open fun init(){
         val jTextField = JTextField(5)
         jTextField.let {
             jTextField.text = attribute.value()
@@ -65,8 +69,7 @@ class ComponentAttributeG : JPanel(), IObservable<Command> {
         createPopupMenu()
     }
 
-
-    private fun createPopupMenu() {
+    fun createPopupMenu() {
         val rename = JMenuItem("Rename")
         rename.addActionListener {
             val text = JOptionPane.showInputDialog("attribute name")
